@@ -1,39 +1,52 @@
-import pygame
 import sys
 
-from constants import BLOCK_SIZE
-from robot import Robot
+import numpy as np
+import pygame
 
-pygame.init()
+from constant.constants import BLOCK_SIZE, ROBOT_START_X, ROBOT_START_Y, GRID_SIZE
+from entity.robot import Robot
 
-display = pygame.display.set_mode((800, 800))
-clock = pygame.time.Clock()
 
-display_scroll = [0, 0]
+def draw_rectangle(x, y):
+    pygame.draw.rect(display, (255, 255, 255), (x, y, BLOCK_SIZE, BLOCK_SIZE))
 
-player = Robot(400, 300, BLOCK_SIZE, BLOCK_SIZE)
 
-while True:
-    display.fill((24, 164, 86))
+if __name__ == "__main__":
+    pygame.init()
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            sys.exit()
+    display = pygame.display.set_mode((1200, 1200))
+    clock = pygame.time.Clock()
 
-    player.main(display)
+    display_scroll = [0, 0]
 
-    keys = pygame.key.get_pressed()
+    player = Robot(ROBOT_START_X, ROBOT_START_Y, BLOCK_SIZE, BLOCK_SIZE)
 
-    pygame.draw.rect(display, (255, 255, 255), (100 - display_scroll[0], 100 - display_scroll[1], BLOCK_SIZE, BLOCK_SIZE))
+    grid = np.zeros(shape=(GRID_SIZE, GRID_SIZE))
+    for (i, j), _ in np.ndenumerate(grid):
+        if i in [0, GRID_SIZE - 1] or j in [0, GRID_SIZE - 1]:
+            grid[i][j] = 1
 
-    if keys[pygame.K_a] or keys[pygame.K_LEFT]:
-        display_scroll[0] -= BLOCK_SIZE
-    if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
-        display_scroll[0] += BLOCK_SIZE
-    if keys[pygame.K_w] or keys[pygame.K_UP]:
-        display_scroll[1] -= BLOCK_SIZE
-    if keys[pygame.K_s] or keys[pygame.K_DOWN]:
-        display_scroll[1] += BLOCK_SIZE
+    while True:
+        display.fill((24, 164, 86))
 
-    clock.tick(20)
-    pygame.display.update()
+        [sys.exit() if event.type == pygame.QUIT else "" for event in pygame.event.get()]
+
+        player.main(display)
+
+        [draw_rectangle(
+            x=(i - display_scroll[0]) * BLOCK_SIZE,
+            y=(j - display_scroll[1]) * BLOCK_SIZE
+        ) if element else 0 for (i, j), element in np.ndenumerate(grid)]
+
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT] and display_scroll[0] > -ROBOT_START_X // BLOCK_SIZE + 1:
+            display_scroll[0] -= 1
+        if keys[pygame.K_RIGHT] and display_scroll[0] < 33:
+            display_scroll[0] += 1
+        if keys[pygame.K_UP] and display_scroll[1] > -ROBOT_START_Y // BLOCK_SIZE + 1:
+            display_scroll[1] -= 1
+        if keys[pygame.K_DOWN] and display_scroll[1] < 39:
+            display_scroll[1] += 1
+
+        clock.tick(20)
+        pygame.display.update()

@@ -1,1 +1,2 @@
-pip install pygame
+pygame~=2.1.2
+numpy~=1.24.1
