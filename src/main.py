@@ -50,16 +50,16 @@ if __name__ == "__main__":
 
         robot.main(display)
 
-        # if len(foods) > 0:
-        #     food_x, food_y = foods[0]
-        #     if robot.x + display_scroll[0] is food_x \
-        #             and robot.y + display_scroll[1] is food_y:
-        #         foods.pop()
-        #         print(f'The can on position {(food_x, food_y)} was collected into trash')
-        #
-        #     pygame.draw.rect(display, (255, 0, 0), ((foods[0][0] - display_scroll[0]) * BLOCK_SIZE,
-        #                                             (foods[0][1] - display_scroll[1]) * BLOCK_SIZE,
-        #                                             BLOCK_SIZE, BLOCK_SIZE))
+        if len(foods) > 0:
+            food_x, food_y = foods[0]
+            if robot.x + display_scroll[0] is food_x \
+                    and robot.y + display_scroll[1] is food_y:
+                foods.remove((food_x, food_y))
+                print(f'The can on position {(food_x, food_y)} was collected into trash')
+            if len(foods) > 0:
+                pygame.draw.rect(display, (255, 0, 0), ((foods[0][0] - display_scroll[0]) * BLOCK_SIZE,
+                                                    (foods[0][1] - display_scroll[1]) * BLOCK_SIZE,
+                                                    BLOCK_SIZE, BLOCK_SIZE))
 
         # draw grid borders
         [draw_rectangle(
