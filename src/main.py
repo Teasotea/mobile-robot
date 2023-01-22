@@ -9,8 +9,13 @@ from entity.grid import Grid
 from entity.robot import Robot
 
 
-def draw_rectangle(x, y):
-    pygame.draw.rect(display, (255, 255, 255), (x, y, BLOCK_SIZE, BLOCK_SIZE))
+def draw_rectangle(x, y, grid):
+    if grid.matrix[x][y]:
+        pygame.draw.rect(display, (255, 255, 255), (x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
+    elif grid.researched[x][y]:
+        pygame.draw.rect(display, (250, 250, 250), (x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
+    else:
+        pass
 
 
 if __name__ == "__main__":
@@ -39,6 +44,8 @@ if __name__ == "__main__":
         # background color
         display.fill((24, 164, 86))
 
+        grid.research(robot.x + display_scroll[0], robot.y + display_scroll[1])
+
         # press exit button on window
         [sys.exit() if event.type == pygame.QUIT else "" for event in pygame.event.get()]
 
@@ -57,19 +64,24 @@ if __name__ == "__main__":
 
         # draw grid borders
         [draw_rectangle(
-            x=(i - display_scroll[0]) * BLOCK_SIZE,
-            y=(j - display_scroll[1]) * BLOCK_SIZE
+            x=(i - display_scroll[0]),
+            y=(j - display_scroll[1]),
+            grid=grid
         ) if element else 0 for (i, j), element in np.ndenumerate(grid.matrix)]
 
         # pressed buttons
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT] and display_scroll[0] > -GRID_SIZE // 2 + 1:
+        if keys[pygame.K_LEFT] \
+                and not grid.isWall(robot.x + display_scroll[0] - 1, robot.y + display_scroll[1]):
             display_scroll[0] -= 1
-        if keys[pygame.K_RIGHT] and display_scroll[0] < (GRID_SIZE - 1) // 2 - 1:
+        if keys[pygame.K_RIGHT] \
+                and not grid.isWall(robot.x + display_scroll[0] + 1, robot.y + display_scroll[1]):
             display_scroll[0] += 1
-        if keys[pygame.K_UP] and display_scroll[1] > -GRID_SIZE // 2 + 1:
+        if keys[pygame.K_UP] \
+                and not grid.isWall(robot.x + display_scroll[0], robot.y + display_scroll[1] - 1):
             display_scroll[1] -= 1
-        if keys[pygame.K_DOWN] and display_scroll[1] < (GRID_SIZE - 1) // 2 - 1:
+        if keys[pygame.K_DOWN] \
+                and not grid.isWall(robot.x + display_scroll[0], robot.y + display_scroll[1] + 1):
             display_scroll[1] += 1
 
         clock.tick(20)
