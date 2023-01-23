@@ -10,7 +10,7 @@ class Grid:
         self.researched = np.zeros(shape=(GRID_SIZE, GRID_SIZE))
 
         n_rows = GRID_SIZE // random.randint(3, 4)
-        n_columns = GRID_SIZE // random.randint(3, 4)
+        n_columns = GRID_SIZE // random.randint(5, 6)
         borders = [0, GRID_SIZE - 1]
         for (i, j), _ in np.ndenumerate(self.matrix):
             # room borders
@@ -28,5 +28,8 @@ class Grid:
         for i in range(x - 1, x + 1):
             for j in range(y - 1, y + 1):
                 self.researched[i][j] = 1
+
+    def setCharger(self, charger):
+        self.matrix[charger.x][charger.y] = 2
 
 
