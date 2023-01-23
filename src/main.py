@@ -22,9 +22,12 @@ def draw_rectangle(x, y, grid, scroll, display):
         #                                             (y - scroll[1]) * BS,
         #                                             BS, BS))
     if grid.matrix[x][y] == 2:
-        pygame.draw.rect(display, (255, 0, 255), ((x - scroll[0]) * BS,
-                                                  (y - scroll[1]) * BS,
-                                                  BS, BS))
+        img_charger = pygame.image.load("src/charger.png")
+        # img_charger = pygame.transform.scale(img_charger, (2 * BS, 2 * BS))
+        display.blit(img_charger, ((x - scroll[0] - 1) * BS, (y - scroll[1] - 1) * BS))
+        # pygame.draw.rect(display, (255, 0, 255), ((x - scroll[0]) * BS,
+        #                                           (y - scroll[1]) * BS,
+        #                                           BS, BS))
 
 
 def handle_pressed_keys(keys, robot, display_scroll):

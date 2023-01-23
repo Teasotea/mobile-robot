@@ -41,14 +41,18 @@ class Robot:
 
     def basic_battery(self, display):
         pygame.draw.rect(display, self.get_battery_color(self.current_battery),
-                         (10, 10, self.current_battery / self.battery_ratio, 25))
-        pygame.draw.rect(display, (255, 255, 255), (10, 10, self.battery_bar_length, 25), 4)
+                         (10, 25, self.current_battery / self.battery_ratio, 25))
+        pygame.draw.rect(display, (255, 255, 255), (10, 25, self.battery_bar_length, 25), 4)
 
     def basic_trash(self, display):
+        img_can = pygame.image.load("src/can.png")
+        img_can = pygame.transform.scale(img_can, (3 * BLOCK_SIZE, 3 * BLOCK_SIZE))
+        display.blit(img_can, (1200 // 2 - 100, 10))
+
         font = pygame.font.Font('freesansbold.ttf', 32)
-        text = font.render(f'trash: {self.current_trash_size} / {self.max_trash_size}', True, (0, 0, 0))
+        text = font.render(f': {self.current_trash_size} / {self.max_trash_size}', True, (0, 0, 0))
         textRect = text.get_rect()
-        textRect.center = (1200 // 2, 25)
+        textRect.center = (1200 // 2, 40)
         display.blit(text, textRect)
 
     def get_battery_color(self, battery):
