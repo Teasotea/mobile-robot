@@ -3,6 +3,7 @@ import random
 import numpy as np
 
 from constant.constants import GRID_SIZE
+from entity.grid.TCell import TCell
 
 
 class Grid:
@@ -16,17 +17,17 @@ class Grid:
         borders = [0, GRID_SIZE - 1]
         for (i, j), _ in np.ndenumerate(self.matrix):
             if i in borders or j in borders:
-                self.matrix[i][j] = 1  # FIXME add ENUM for cell types
+                self.matrix[i][j] = TCell.WALL.value
             else:
                 if i % n_rows == 0 or j % n_columns == 0:
-                    self.matrix[i][j] = 1
+                    self.matrix[i][j] = TCell.WALL.value
                 if i % n_rows == 0 and j % n_columns == 4:
-                    self.matrix[i][j] = 0
+                    self.matrix[i][j] = TCell.EMPTY.value
                 if i % n_rows == 2 and j % n_columns == 0:
-                    self.matrix[i][j] = 0
+                    self.matrix[i][j] = TCell.EMPTY.value
 
     def isWall(self, x, y):
-        return self.matrix[x][y] == 1
+        return self.matrix[x][y] == TCell.WALL.value
 
     def research(self, x, y):
         for i in [-1, 0, 1]:
@@ -36,7 +37,7 @@ class Grid:
                     self.researched[x + i][y + j] += 1
 
     def setCharger(self, charger):
-        self.matrix[charger.x][charger.y] = 2
+        self.matrix[charger.x][charger.y] = TCell.CHARGER.value
 
     def get_researched_prob_matrix(self):
         return self.researched / self.total_researched_cells

@@ -1,37 +1,30 @@
 import sys
 import time
 
-import pygame
-
 import matplotlib.pyplot as plt
 import numpy as np
+import pygame
 
 from constant.constants import BLOCK_SIZE as BS, GRID_SIZE
 from entity.charger.Charger import Charger
 from entity.grid.Grid import Grid
+from entity.robot.Battery import Battery
 from entity.robot.Robot import Robot
 from service.CanGenerator import CanGenerator
 
 
 def draw_rectangle(x, y, grid, scroll, display):
     if grid.matrix[x][y] == 1:
-        img_brick_wall = pygame.image.load("src/brick-wall-2.png")
+        img_brick_wall = pygame.image.load("src/resources/brick-wall.png")
         img_brick_wall = pygame.transform.scale(img_brick_wall, (BS, BS))
         display.blit(img_brick_wall, ((x - scroll[0]) * BS, (y - scroll[1]) * BS))
-        # pygame.draw.rect(display, (255, 255, 255), ((x - scroll[0]) * BS,
-        #                                             (y - scroll[1]) * BS,
-        #                                             BS, BS))
     if grid.matrix[x][y] == 2:
-        img_charger = pygame.image.load("src/charger.png")
-        # img_charger = pygame.transform.scale(img_charger, (2 * BS, 2 * BS))
+        img_charger = pygame.image.load("src/resources/charger.png")
         display.blit(img_charger, ((x - scroll[0] - 1) * BS, (y - scroll[1] - 1) * BS))
-        # pygame.draw.rect(display, (255, 0, 255), ((x - scroll[0]) * BS,
-        #                                           (y - scroll[1]) * BS,
-        #                                           BS, BS))
 
 
 def handle_pressed_keys(keys, robot, display_scroll):
-    if robot.current_battery == 0:
+    if not robot.can_move():
         return display_scroll
     changed = False
     if keys[pygame.K_LEFT] \
