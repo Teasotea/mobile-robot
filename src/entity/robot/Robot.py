@@ -8,12 +8,29 @@ class Robot:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.current_battery = 200
+
+        self.max_trash_size = 10
+        self.current_trash_size = 0
+
+        self.current_battery = 1000
         self.max_battery = 1000
         self.battery_bar_length = 400
         self.battery_ratio = self.max_battery / self.battery_bar_length
 
+    def collect_can(self):
+        self.current_trash_size += 1 if self.can_collect_can() else 0
+
+    def can_collect_can(self):
+        return self.current_trash_size < self.max_trash_size
+
+    def clean_cans(self):
+        self.current_trash_size = 0
+
+    def is_trash_empty(self):
+        return self.current_trash_size == 0
+
     def update(self, display):
+        self.basic_trash(display)
         self.basic_battery(display)
 
     def dying_damage(self, amount):
@@ -26,6 +43,9 @@ class Robot:
         pygame.draw.rect(display, self.get_battery_color(self.current_battery),
                          (10, 10, self.current_battery / self.battery_ratio, 25))
         pygame.draw.rect(display, (255, 255, 255), (10, 10, self.battery_bar_length, 25), 4)
+
+    def basic_trash(self, display):
+        pass  # draw number of trash cans out of max
 
     def get_battery_color(self, battery):
         if battery < self.max_battery // 3:
