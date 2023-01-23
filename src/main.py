@@ -9,7 +9,7 @@ import numpy as np
 from constant.constants import BLOCK_SIZE as BS, GRID_SIZE
 from entity.charger.Charger import Charger
 from entity.grid.Grid import Grid
-from entAdd ity.robot.Robot import Robot
+from entity.robot.Robot import Robot
 from service.CanGenerator import CanGenerator
 
 

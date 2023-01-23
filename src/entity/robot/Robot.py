@@ -45,7 +45,11 @@ class Robot:
         pygame.draw.rect(display, (255, 255, 255), (10, 10, self.battery_bar_length, 25), 4)
 
     def basic_trash(self, display):
-        pass  # draw number of trash cans out of max
+        font = pygame.font.Font('freesansbold.ttf', 32)
+        text = font.render(f'trash: {self.current_trash_size} / {self.max_trash_size}', True, (0, 0, 0))
+        textRect = text.get_rect()
+        textRect.center = (1200 // 2, 25)
+        display.blit(text, textRect)
 
     def get_battery_color(self, battery):
         if battery < self.max_battery // 3:
