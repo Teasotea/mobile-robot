@@ -59,6 +59,9 @@ class Robot:
         return (255, 255, 0)
 
     def main(self, display):
-        pygame.draw.rect(display, (105, 105, 105),
-                         ((self.x - 1) * BLOCK_SIZE, (self.y - 1) * BLOCK_SIZE, 3 * BLOCK_SIZE, 3 * BLOCK_SIZE))
-        pygame.draw.rect(display, (0, 0, 0), (self.x * BLOCK_SIZE, self.y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
+        # pygame.draw.rect(display, (105, 105, 105),
+        #                  ((self.x - 1) * BLOCK_SIZE, (self.y - 1) * BLOCK_SIZE, 3 * BLOCK_SIZE, 3 * BLOCK_SIZE))
+        # pygame.draw.rect(display, (0, 0, 0), (self.x * BLOCK_SIZE, self.y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
+        img_robot = pygame.image.load("src/robot.png")
+        img_robot = pygame.transform.scale(img_robot, (3 * BLOCK_SIZE, 3 * BLOCK_SIZE))
+        display.blit(img_robot, ((self.x - 1) * BLOCK_SIZE, (self.y - 1) * BLOCK_SIZE))

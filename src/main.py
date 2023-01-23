@@ -13,11 +13,14 @@ from entity.robot.Robot import Robot
 from service.CanGenerator import CanGenerator
 
 
-def draw_rectangle(x, y, grid, scroll):
+def draw_rectangle(x, y, grid, scroll, display):
     if grid.matrix[x][y] == 1:
-        pygame.draw.rect(display, (255, 255, 255), ((x - scroll[0]) * BS,
-                                                    (y - scroll[1]) * BS,
-                                                    BS, BS))
+        img_brick_wall = pygame.image.load("src/brick-wall-2.png")
+        img_brick_wall = pygame.transform.scale(img_brick_wall, (BS, BS))
+        display.blit(img_brick_wall, ((x - scroll[0]) * BS, (y - scroll[1]) * BS))
+        # pygame.draw.rect(display, (255, 255, 255), ((x - scroll[0]) * BS,
+        #                                             (y - scroll[1]) * BS,
+        #                                             BS, BS))
     if grid.matrix[x][y] == 2:
         pygame.draw.rect(display, (255, 0, 255), ((x - scroll[0]) * BS,
                                                   (y - scroll[1]) * BS,
@@ -63,6 +66,8 @@ if __name__ == "__main__":
     pygame.init()
 
     display = pygame.display.set_mode((1200, 1200))
+    pygame.display.set_caption('Mobile Robot')
+
     clock = pygame.time.Clock()
 
     display_scroll = [-GRID_SIZE // 2 + 1, -GRID_SIZE // 2 + 1]
@@ -88,8 +93,9 @@ if __name__ == "__main__":
         if can_generator.isNotEmpty():
             x = robot.x + display_scroll[0]
             y = robot.y + display_scroll[1]
-            if can_generator.has_can_at(x, y) and robot.can_collect_can():
-                can_generator.remove(x, y)
+            can = can_generator.has_can_near(x, y)
+            if can is not None and robot.can_collect_can():
+                can_generator.remove(can[0], can[1])
                 robot.collect_can()
             else:
                 can_generator.draw_cans(display, display_scroll)
@@ -98,7 +104,8 @@ if __name__ == "__main__":
             x=i,
             y=j,
             grid=grid,
-            scroll=display_scroll
+            scroll=display_scroll,
+            display=display
         ) if element > 0 else 0 for (i, j), element in np.ndenumerate(grid.matrix)]
 
         robot.update(display)

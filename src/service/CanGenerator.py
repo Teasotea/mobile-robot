@@ -36,11 +36,22 @@ class CanGenerator:
         return self.cans[0][0] == x and self.cans[0][1] == y
 
     def draw_cans(self, screen, scroll):
+        img_can = pygame.image.load("src/can.png")
+        img_can = pygame.transform.scale(img_can, (2 * BS, 2 * BS))
+        # screen.blit(img_can, ((x - scroll[0]) * BS, (y - scroll[1]) * BS))
         for can in self.cans:
-            pygame.draw.rect(screen, (255, 0, 0), (
-                (can[0] - scroll[0]) * BS,
-                (can[1] - scroll[1]) * BS,
-                BS, BS))
+            # pygame.draw.rect(screen, (255, 0, 0), (
+            #     (can[0] - scroll[0]) * BS,
+            #     (can[1] - scroll[1]) * BS,
+            #     BS, BS))
+            screen.blit(img_can, ((can[0] - scroll[0]) * BS,(can[1] - scroll[1]) * BS))
+
+    def has_can_near(self, x, y):
+        for i in [-1, 0, 1]:
+            for j in [-1, 0, 1]:
+                if self.has_can_at(x + i, y + j):
+                    return (x + i, y + j)
+        return None
 
     def has_can_at(self, x, y):
         return (x, y) in self.cans
