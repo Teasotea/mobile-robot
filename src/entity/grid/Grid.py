@@ -1,5 +1,6 @@
-import numpy as np
 import random
+
+import numpy as np
 
 from constant.constants import GRID_SIZE
 
@@ -31,5 +32,3 @@ class Grid:
 
     def setCharger(self, charger):
         self.matrix[charger.x][charger.y] = 2
-
-
