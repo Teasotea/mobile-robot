@@ -20,18 +20,24 @@ class CanGenerator:
     def get_current_can(self):
         return self.cans[0] if self.isNotEmpty() else None
 
-    def generate(self, grid):
+    def generateOnTime(self, grid):
         now = time.time()
         if int(now - self.last_time) < 7:
             return
-        x, y = random.randint(3, 55), random.randint(3, 55)
+        x, y = self.generate()
         if not grid.matrix[x][y] and not self.has_can_at(x, y):
             self.cans.append((x, y))
             print(f'Can was generated at {x, y}')
             self.last_time = now
 
+    def generate(self):
+        return random.randint(3, 55), random.randint(3, 55)
+
     def isNotEmpty(self):
         return len(self.cans) != 0
+
+    def isEmpty(self):
+        return len(self.cans) == 0
 
     def isEqual(self, x, y):
         if not self.isNotEmpty():
@@ -51,3 +57,9 @@ class CanGenerator:
 
     def has_can_at(self, x, y):
         return (x, y) in self.cans
+
+    def generate10(self, grid):
+        while len(self.cans) < 10:
+            x, y = self.generate()
+            if not grid.matrix[x][y] and not self.has_can_at(x, y):
+                self.cans.append((x, y))

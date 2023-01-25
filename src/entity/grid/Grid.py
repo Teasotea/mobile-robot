@@ -21,9 +21,9 @@ class Grid:
             else:
                 if i % n_rows == 0 or j % n_columns == 0:
                     self.matrix[i][j] = TCell.WALL.value
-                if i % n_rows == 0 and j % n_columns == 4:
+                if i % n_rows == 0 and j % n_columns == random.randint(2, 5):
                     self.matrix[i][j] = TCell.EMPTY.value
-                if i % n_rows == 2 and j % n_columns == 0:
+                if i % n_rows == random.randint(2, 5) and j % n_columns == 0:
                     self.matrix[i][j] = TCell.EMPTY.value
 
     def isWall(self, x, y):

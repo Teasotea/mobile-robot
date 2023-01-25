@@ -75,6 +75,7 @@ if __name__ == "__main__":
     grid.setCharger(charger)
 
     can_generator = CanGenerator()
+    can_generator.generate10(grid)
 
     last_charged = time.time()
     while True:
@@ -83,8 +84,6 @@ if __name__ == "__main__":
         [handle_exit(grid) if event.type == pygame.QUIT else "" for event in pygame.event.get()]
 
         robot.main(display)
-
-        can_generator.generate(grid)
 
         if can_generator.isNotEmpty():
             x = robot.x + display_scroll[0]
@@ -110,10 +109,13 @@ if __name__ == "__main__":
                 and abs(robot.y - (charger.y - display_scroll[1])) <= 1:
             robot.get_battery(5)
             robot.clean_cans()
+            if can_generator.isEmpty():
+                print('You\'ve successfully collected all cans.')
+                handle_exit(grid)
             last_charged = time.time()
         else:
             diff = int(time.time() - last_charged)
-            robot.dying_damage(diff * 10)
+            robot.dying_damage(diff * 20)
             last_charged += diff
 
         keys = pygame.key.get_pressed()
