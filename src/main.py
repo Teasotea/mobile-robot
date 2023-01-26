@@ -8,7 +8,6 @@ import pygame
 from constant.constants import BLOCK_SIZE as BS, GRID_SIZE
 from entity.charger.Charger import Charger
 from entity.grid.Grid import Grid
-from entity.robot.Battery import Battery
 from entity.robot.Robot import Robot
 from service.CanGenerator import CanGenerator
 
