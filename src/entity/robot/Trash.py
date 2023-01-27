@@ -4,19 +4,19 @@ class Trash:
         self.current_size = 0
 
     def add(self):
-        self.current_size += 1 if self.is_not_full() else 0
+        self.current_size += 1 if self.isNotFull() else 0
 
-    def is_not_full(self):
+    def isNotFull(self):
         return self.current_size < self.max_size
 
     def clean(self):
         self.current_size = 0
 
-    def is_empty(self):
+    def isEmpty(self):
         return self.current_size == 0
 
-    def get_current_size(self):
+    def getCurrentSize(self):
         return self.current_size
 
-    def get_max_size(self):
+    def getMaxSize(self):
         return self.max_size

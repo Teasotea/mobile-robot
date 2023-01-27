@@ -17,7 +17,7 @@ class CanGenerator:
         if self.isNotEmpty():
             self.cans.remove((x, y))
 
-    def get_current_can(self):
+    def getCurrentCan(self):
         return self.cans[0] if self.isNotEmpty() else None
 
     def generateOnTime(self, grid):
@@ -25,7 +25,7 @@ class CanGenerator:
         if int(now - self.last_time) < 7:
             return
         x, y = self.generate()
-        if not grid.matrix[x][y] and not self.has_can_at(x, y):
+        if not grid.matrix[x][y] and not self.hasCanAt(x, y):
             self.cans.append((x, y))
             print(f'Can was generated at {x, y}')
             self.last_time = now
@@ -44,22 +44,22 @@ class CanGenerator:
             return False
         return self.cans[0][0] == x and self.cans[0][1] == y
 
-    def draw_cans(self, screen, scroll):
+    def drawCans(self, screen, scroll):
         for can in self.cans:
             screen.blit(self.img_can, ((can[0] - scroll[0]) * BS, (can[1] - scroll[1]) * BS))
 
-    def has_can_near(self, x, y):
+    def hasCanNear(self, x, y):
         for i in [-1, 0, 1]:
             for j in [-1, 0, 1]:
-                if self.has_can_at(x + i, y + j):
+                if self.hasCanAt(x + i, y + j):
                     return x + i, y + j
         return None
 
-    def has_can_at(self, x, y):
+    def hasCanAt(self, x, y):
         return (x, y) in self.cans
 
     def generate10(self, grid):
         while len(self.cans) < 10:
             x, y = self.generate()
-            if not grid.matrix[x][y] and not self.has_can_at(x, y):
+            if not grid.matrix[x][y] and not self.hasCanAt(x, y):
                 self.cans.append((x, y))

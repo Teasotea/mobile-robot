@@ -11,17 +11,17 @@ class Battery:
     def charge(self, amount):
         self.current = min(self.max, self.current + amount)
 
-    def get_max(self):
+    def getMax(self):
         return self.max
 
-    def get_current(self):
+    def getCurrent(self):
         return self.current
 
-    def get_ratio(self):
+    def getRatio(self):
         return self.ratio
 
-    def get_bar_len(self):
+    def getBarLen(self):
         return self.bar_length
 
-    def can_move(self):
+    def canMove(self):
         return self.current > 0

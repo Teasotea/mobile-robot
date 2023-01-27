@@ -10,6 +10,7 @@ from entity.charger.Charger import Charger
 from entity.grid.Grid import Grid
 from entity.robot.Robot import Robot
 from service.CanGenerator import CanGenerator
+from service.algorithm.AStar import AStar
 
 
 def draw_rectangle(x, y, grid, scroll, display):
@@ -23,7 +24,7 @@ def draw_rectangle(x, y, grid, scroll, display):
 
 
 def handle_pressed_keys(keys, robot, display_scroll):
-    if not robot.can_move():
+    if not robot.canMove():
         return display_scroll
     changed = False
     if keys[pygame.K_LEFT] \
@@ -50,7 +51,7 @@ def handle_pressed_keys(keys, robot, display_scroll):
 
 
 def handle_exit(grid):
-    probs = grid.get_researched_prob_matrix()
+    probs = grid.getResearchedProbMatrix()
     plt.imshow(probs, cmap='hot', interpolation='nearest')
     plt.show()
 
@@ -77,48 +78,52 @@ if __name__ == "__main__":
     can_generator.generate10(grid)
 
     last_charged = time.time()
-    while True:
-        display.fill((24, 164, 86))
 
-        [handle_exit(grid) if event.type == pygame.QUIT else "" for event in pygame.event.get()]
+    astar = AStar(grid, can_generator.cans, robot)
+    astar.solve()
 
-        robot.main(display)
-
-        if can_generator.isNotEmpty():
-            x = robot.x + display_scroll[0]
-            y = robot.y + display_scroll[1]
-            can = can_generator.has_can_near(x, y)
-            if can is not None and robot.can_collect_can():
-                can_generator.remove(can[0], can[1])
-                robot.collect_can()
-            else:
-                can_generator.draw_cans(display, display_scroll)
-
-        [draw_rectangle(
-            x=i,
-            y=j,
-            grid=grid,
-            scroll=display_scroll,
-            display=display
-        ) if element > 0 else 0 for (i, j), element in np.ndenumerate(grid.matrix)]
-
-        robot.update(display)
-
-        if abs(robot.x - (charger.x - display_scroll[0])) <= 1 \
-                and abs(robot.y - (charger.y - display_scroll[1])) <= 1:
-            robot.get_battery(5)
-            robot.clean_cans()
-            if can_generator.isEmpty():
-                print('You\'ve successfully collected all cans.')
-                handle_exit(grid)
-            last_charged = time.time()
-        else:
-            diff = int(time.time() - last_charged)
-            robot.dying_damage(diff * 20)
-            last_charged += diff
-
-        keys = pygame.key.get_pressed()
-        display_scroll = handle_pressed_keys(keys, robot, display_scroll)
-
-        clock.tick(15)
-        pygame.display.update()
+    # while True:
+    #     display.fill((24, 164, 86))
+    #
+    #     [handle_exit(grid) if event.type == pygame.QUIT else "" for event in pygame.event.get()]
+    #
+    #     robot.main(display)
+    #
+    #     if can_generator.isNotEmpty():
+    #         x = robot.x + display_scroll[0]
+    #         y = robot.y + display_scroll[1]
+    #         can = can_generator.hasCanNear(x, y)
+    #         if can is not None and robot.canCollectCan():
+    #             can_generator.remove(can[0], can[1])
+    #             robot.collectCan()
+    #         else:
+    #             can_generator.drawCans(display, display_scroll)
+    #
+    #     [draw_rectangle(
+    #         x=i,
+    #         y=j,
+    #         grid=grid,
+    #         scroll=display_scroll,
+    #         display=display
+    #     ) if element > 0 else 0 for (i, j), element in np.ndenumerate(grid.matrix)]
+    #
+    #     robot.update(display)
+    #
+    #     if abs(robot.x - (charger.x - display_scroll[0])) <= 1 \
+    #             and abs(robot.y - (charger.y - display_scroll[1])) <= 1:
+    #         robot.getBattery(5)
+    #         robot.cleanCans()
+    #         if can_generator.isEmpty():
+    #             print('You\'ve successfully collected all cans.')
+    #             handle_exit(grid)
+    #         last_charged = time.time()
+    #     else:
+    #         diff = int(time.time() - last_charged)
+    #         robot.dyingDamage(diff * 20)
+    #         last_charged += diff
+    #
+    #     keys = pygame.key.get_pressed()
+    #     display_scroll = handle_pressed_keys(keys, robot, display_scroll)
+    #
+    #     clock.tick(15)
+    #     pygame.display.update()

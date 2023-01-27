@@ -39,5 +39,5 @@ class Grid:
     def setCharger(self, charger):
         self.matrix[charger.x][charger.y] = TCell.CHARGER.value
 
-    def get_researched_prob_matrix(self):
+    def getResearchedProbMatrix(self):
         return self.researched / self.total_researched_cells
