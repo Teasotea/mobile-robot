@@ -1,3 +1,4 @@
+import copy
 import sys
 import time
 
@@ -58,6 +59,15 @@ def handle_exit(grid):
     sys.exit()
 
 
+def handle_path_key(path, scroll):
+    current = path[0]
+    del path[0]
+    cnt = current[0] - path[0][0], current[1] - path[0][1]
+    scroll[0] -= cnt[0]
+    scroll[1] -= cnt[1]
+    return scroll
+
+
 if __name__ == "__main__":
     pygame.init()
 
@@ -79,51 +89,56 @@ if __name__ == "__main__":
 
     last_charged = time.time()
 
-    astar = AStar(grid, can_generator.cans, robot)
-    astar.solve()
+    astar = AStar(grid, copy.deepcopy(can_generator.cans), robot, copy.deepcopy(display_scroll))
+    path = astar.solve()
+    if len(path) == 0:
+        print("No path")
+        handle_exit(grid)
 
-    # while True:
-    #     display.fill((24, 164, 86))
-    #
-    #     [handle_exit(grid) if event.type == pygame.QUIT else "" for event in pygame.event.get()]
-    #
-    #     robot.main(display)
-    #
-    #     if can_generator.isNotEmpty():
-    #         x = robot.x + display_scroll[0]
-    #         y = robot.y + display_scroll[1]
-    #         can = can_generator.hasCanNear(x, y)
-    #         if can is not None and robot.canCollectCan():
-    #             can_generator.remove(can[0], can[1])
-    #             robot.collectCan()
-    #         else:
-    #             can_generator.drawCans(display, display_scroll)
-    #
-    #     [draw_rectangle(
-    #         x=i,
-    #         y=j,
-    #         grid=grid,
-    #         scroll=display_scroll,
-    #         display=display
-    #     ) if element > 0 else 0 for (i, j), element in np.ndenumerate(grid.matrix)]
-    #
-    #     robot.update(display)
-    #
-    #     if abs(robot.x - (charger.x - display_scroll[0])) <= 1 \
-    #             and abs(robot.y - (charger.y - display_scroll[1])) <= 1:
-    #         robot.getBattery(5)
-    #         robot.cleanCans()
-    #         if can_generator.isEmpty():
-    #             print('You\'ve successfully collected all cans.')
-    #             handle_exit(grid)
-    #         last_charged = time.time()
-    #     else:
-    #         diff = int(time.time() - last_charged)
-    #         robot.dyingDamage(diff * 20)
-    #         last_charged += diff
-    #
-    #     keys = pygame.key.get_pressed()
-    #     display_scroll = handle_pressed_keys(keys, robot, display_scroll)
-    #
-    #     clock.tick(15)
-    #     pygame.display.update()
+    while True:
+        display.fill((24, 164, 86))
+
+        [handle_exit(grid) if event.type == pygame.QUIT else "" for event in pygame.event.get()]
+
+        robot.main(display)
+
+        if can_generator.isNotEmpty():
+            x = robot.x + display_scroll[0]
+            y = robot.y + display_scroll[1]
+            can = can_generator.hasCanNear(x, y)
+            if can is not None and robot.canCollectCan():
+                can_generator.remove(can[0], can[1])
+                robot.collectCan()
+            else:
+                can_generator.drawCans(display, display_scroll)
+
+        [draw_rectangle(
+            x=i,
+            y=j,
+            grid=grid,
+            scroll=display_scroll,
+            display=display
+        ) if element > 0 else 0 for (i, j), element in np.ndenumerate(grid.matrix)]
+
+        robot.update(display)
+
+        if abs(robot.x - (charger.x - display_scroll[0])) <= 1 \
+                and abs(robot.y - (charger.y - display_scroll[1])) <= 1:
+            robot.getBattery(5)
+            robot.cleanCans()
+            if can_generator.isEmpty():
+                print('You\'ve successfully collected all cans.')
+                handle_exit(grid)
+            last_charged = time.time()
+        else:
+            diff = int(time.time() - last_charged)
+            robot.dyingDamage(diff * 20)
+            last_charged += diff
+
+        # keys = pygame.key.get_pressed()
+        # display_scroll = handle_pressed_keys(keys, robot, display_scroll)
+
+        display_scroll = handle_path_key(path, display_scroll)
+
+        clock.tick(15)
+        pygame.display.update()
