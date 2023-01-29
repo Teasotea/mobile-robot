@@ -60,9 +60,11 @@ def handle_exit(grid):
 
 
 def handle_path_key(path, scroll):
+    if len(path) == 1:
+        return scroll
     current = path[0]
     del path[0]
-    cnt = current[0] - path[0][0], current[1] - path[0][1]
+    cnt = current[0] - path[0][0], current[1] - path[0][1]  # FIXME
     scroll[0] -= cnt[0]
     scroll[1] -= cnt[1]
     return scroll

@@ -27,6 +27,8 @@ class AStar:
         min_dist = 10000
         min_can = -1
         for can in self.cans:
+            if can == (2, 2) and len(self.cans) > 1:
+                continue
             manh_dist = self.manhattanHeuristic(can)
             if manh_dist < min_dist:
                 min_dist, min_can = manh_dist, can
@@ -53,7 +55,7 @@ class AStar:
 
     def solve(self):
         minimal_path = []
-        destination = (1, 1)
+        destination = (2, 2)
 
         self.cans.append(destination)
 
@@ -69,7 +71,7 @@ class AStar:
             while len(current) > 0:
                 if end in visited:
                     break
-                v = current.pop()
+                v = current.pop(0)
                 for successor in self.getSuccessors(v):
                     if successor not in visited:
                         visited.append(successor)
@@ -87,6 +89,8 @@ class AStar:
                     temp = path[temp]
                 ans = ans[::-1]
                 minimal_path += ans
+                if end == destination:
+                    print(ans)
             else:
                 print(f"No path between {start} and {end}")
 
