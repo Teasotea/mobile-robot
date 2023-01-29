@@ -5,9 +5,9 @@ from entity.robot.Robot import Robot
 class AStar:
     def __init__(self, grid, cans, robot: Robot, scroll):
         self.grid = grid
-        self.cans = cans
         self.robot = robot
         self.scroll = scroll
+        self.cans = cans
 
     @property
     def robotCoordinates(self):
@@ -17,6 +17,9 @@ class AStar:
     @property
     def destination(self):
         return 2, 2
+
+    # def addCan(self, can):
+    #     self.cans.append(can)
 
     def manhattanHeuristic(self, can):
         robot_x, robot_y = self.robotCoordinates
@@ -33,6 +36,8 @@ class AStar:
             manh_dist = self.manhattanHeuristic(can)
             if manh_dist < min_dist:
                 min_dist, min_can = manh_dist, can
+        if min_can not in self.cans:
+            return None
         self.cans.remove(min_can)
         return min_can
 
@@ -56,33 +61,29 @@ class AStar:
             temp = path[temp]
         return result[::-1]
 
-    def solve(self):
-        minimal_path = []
-        self.cans.append(self.destination)
+    def solve(self, end=None):
+        start = self.robotCoordinates
+        end = self.nextCan if end is None else end
+        if end is None:
+            return None
 
-        while len(self.cans) > 0:
-            start = self.robotCoordinates
-            end = self.nextCan
+        visited, current = [start], [start]
+        path = dict()
+        path[start] = -1
 
-            visited, current = [start], [start]
-            path = dict()
-            path[start] = -1
+        while len(current) > 0 and end not in visited:
+            v = current.pop(0)
+            for successor in self.getSuccessors(v):
+                if successor not in visited:
+                    visited.append(successor)
+                    current.append(successor)
+                    path[successor] = v
 
-            while len(current) > 0 and end not in visited:
-                v = current.pop(0)
-                for successor in self.getSuccessors(v):
-                    if successor not in visited:
-                        visited.append(successor)
-                        current.append(successor)
-                        path[successor] = v
-
-            if end in visited:
-                self.updateScroll(end)
-                minimal_path += self.getPath(path, end)
-            else:
-                print(f"No path between {start} and {end}")
-
-        return minimal_path
+        if end in visited:
+            self.updateScroll(end)
+            return self.getPath(path, end)
+        else:
+            print(f"No path between {start} and {end}")
 
     def updateScroll(self, pos):
         self.scroll[0] = pos[0] - self.robot.x

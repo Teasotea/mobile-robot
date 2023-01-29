@@ -15,15 +15,17 @@ class Grid:
         n_rows = GRID_SIZE // random.randint(3, 4)
         n_columns = GRID_SIZE // random.randint(3, 4)
         borders = [0, GRID_SIZE - 1]
+        k_1 = random.randint(1, 3)
+        k_2 = random.randint(1, 3)
         for (i, j), _ in np.ndenumerate(self.matrix):
             if i in borders or j in borders:
                 self.matrix[i][j] = TCell.WALL.value
             else:
                 if i % n_rows == 0 or j % n_columns == 0:
                     self.matrix[i][j] = TCell.WALL.value
-                if i % n_rows == 0 and j % n_columns == random.randint(2, 4):
+                if i % n_rows == 0 and j % n_columns == k_1:
                     self.matrix[i][j] = TCell.EMPTY.value
-                if i % n_rows == random.randint(2, 4) and j % n_columns == 0:
+                if i % n_rows == k_2 and j % n_columns == 0:
                     self.matrix[i][j] = TCell.EMPTY.value
 
     def isWall(self, x, y):

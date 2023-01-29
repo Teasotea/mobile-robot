@@ -48,15 +48,15 @@ class CanGenerator:
         for can in self.cans:
             screen.blit(self.img_can, ((can[0] - scroll[0]) * BS, (can[1] - scroll[1]) * BS))
 
-    def hasCanNear(self, x, y):
-        for i in [-1, 0, 1]:
-            for j in [-1, 0, 1]:
-                if self.hasCanAt(x + i, y + j):
-                    return x + i, y + j
-        return None
+    # def hasCanNear(self, x, y):
+    #     for i in [-1, 0, 1]:
+    #         for j in [-1, 0, 1]:
+    #             if self.hasCanAt(x + i, y + j):
+    #                 return x + i, y + j
+    #     return None
 
     def hasCanAt(self, x, y):
-        return (x, y) in self.cans
+        return (x, y) if (x, y) in self.cans else None
 
     def generate10(self, grid):
         while len(self.cans) < 10:

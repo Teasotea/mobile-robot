@@ -59,8 +59,8 @@ def handle_exit(grid):
     sys.exit()
 
 
-def handle_path_key(path, scroll):
-    if len(path) == 1:
+def handle_path_key(path, scroll, robot):
+    if path is None or len(path) <= 1 or robot.canMove() is False:
         return scroll
     current = path[0]
     del path[0]
@@ -91,11 +91,10 @@ if __name__ == "__main__":
 
     last_charged = time.time()
 
-    astar = AStar(grid, copy.deepcopy(can_generator.cans), robot, copy.deepcopy(display_scroll))
+    cans = copy.deepcopy(can_generator.cans)
+    cans.append((2, 2))
+    astar = AStar(grid, cans, robot, copy.deepcopy(display_scroll))
     path = astar.solve()
-    if len(path) == 0:
-        print("No path")
-        handle_exit(grid)
 
     while True:
         display.fill((24, 164, 86))
@@ -107,10 +106,11 @@ if __name__ == "__main__":
         if can_generator.isNotEmpty():
             x = robot.x + display_scroll[0]
             y = robot.y + display_scroll[1]
-            can = can_generator.hasCanNear(x, y)
-            if can is not None and robot.canCollectCan():
+            can = can_generator.hasCanAt(x, y)
+            if can and robot.canCollectCan():
                 can_generator.remove(can[0], can[1])
                 robot.collectCan()
+                path = astar.solve()
             else:
                 can_generator.drawCans(display, display_scroll)
 
@@ -140,7 +140,7 @@ if __name__ == "__main__":
         # keys = pygame.key.get_pressed()
         # display_scroll = handle_pressed_keys(keys, robot, display_scroll)
 
-        display_scroll = handle_path_key(path, display_scroll)
+        display_scroll = handle_path_key(path, display_scroll, robot)
 
         clock.tick(15)
         pygame.display.update()
