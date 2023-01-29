@@ -1,5 +1,4 @@
-import numpy as np
-
+from entity.grid.TCell import TCell
 from entity.robot.Robot import Robot
 
 
@@ -10,24 +9,26 @@ class AStar:
         self.robot = robot
         self.scroll = scroll
 
-    def nullHeuristic(self):
-        return 0
-
     @property
     def robotCoordinates(self):
         robot_x, robot_y = self.robot.getCurrentPosition()
         return robot_x + self.scroll[0], robot_y + self.scroll[1]
+
+    @property
+    def destination(self):
+        return 2, 2
 
     def manhattanHeuristic(self, can):
         robot_x, robot_y = self.robotCoordinates
         can_x, can_y = can
         return abs(robot_x - can_x) + abs(robot_y - can_y)
 
-    def pickCan(self):
+    @property
+    def nextCan(self):
         min_dist = 10000
         min_can = -1
         for can in self.cans:
-            if can == (2, 2) and len(self.cans) > 1:
+            if can == self.destination and len(self.cans) > 1:
                 continue
             manh_dist = self.manhattanHeuristic(can)
             if manh_dist < min_dist:
@@ -35,63 +36,54 @@ class AStar:
         self.cans.remove(min_can)
         return min_can
 
+    @property
     def possibleDirections(self):
-        return [
-            (0, 0),
-            (1, 0),
-            (0, 1),
-            (-1, 0),
-            (0, -1)
-        ]
+        return [(0, 0), (1, 0), (0, 1), (-1, 0), (0, -1)]
 
     def getSuccessors(self, current):
-        # current = self.robot.getCurrentPosition()
         successors = []
-        for direction in self.possibleDirections():
-            possible_successor = current[0] + direction[0], current[1] + direction[1]
-            if self.grid.matrix[possible_successor[0]][possible_successor[1]] == 0:
-                successors.append(possible_successor)
+        for direction in self.possibleDirections:
+            x, y = current[0] + direction[0], current[1] + direction[1]
+            if self.grid.matrix[x][y] == TCell.EMPTY.value:
+                successors.append((x, y))
         return successors
+
+    def getPath(self, path, end):
+        result = []
+        temp = end
+        while temp != -1:
+            result.append(temp)
+            temp = path[temp]
+        return result[::-1]
 
     def solve(self):
         minimal_path = []
-        destination = (2, 2)
-
-        self.cans.append(destination)
+        self.cans.append(self.destination)
 
         while len(self.cans) > 0:
-            dist, path = dict(), dict()
-
             start = self.robotCoordinates
-            end = self.pickCan()
+            end = self.nextCan
 
-            visited = [start]
-            current = [start]
+            visited, current = [start], [start]
+            path = dict()
             path[start] = -1
-            while len(current) > 0:
-                if end in visited:
-                    break
+
+            while len(current) > 0 and end not in visited:
                 v = current.pop(0)
                 for successor in self.getSuccessors(v):
                     if successor not in visited:
                         visited.append(successor)
                         current.append(successor)
-                        # dist[successor] += 1
                         path[successor] = v
-            if end in visited:
-                self.scroll[0] = end[0] - self.robot.x
-                self.scroll[1] = end[1] - self.robot.y
 
-                ans = []
-                temp = end
-                while temp != -1:
-                    ans.append(temp)
-                    temp = path[temp]
-                ans = ans[::-1]
-                minimal_path += ans
-                if end == destination:
-                    print(ans)
+            if end in visited:
+                self.updateScroll(end)
+                minimal_path += self.getPath(path, end)
             else:
                 print(f"No path between {start} and {end}")
 
         return minimal_path
+
+    def updateScroll(self, pos):
+        self.scroll[0] = pos[0] - self.robot.x
+        self.scroll[1] = pos[1] - self.robot.y
