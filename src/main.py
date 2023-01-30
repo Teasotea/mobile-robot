@@ -12,6 +12,7 @@ from entity.grid.Grid import Grid
 from entity.robot.Robot import Robot
 from service.CanGenerator import CanGenerator
 from service.algorithm.AStar import AStar
+from service.algorithm.QLearning import QLearning
 
 
 def draw_rectangle(x, y, grid, scroll, display):
@@ -93,54 +94,57 @@ if __name__ == "__main__":
 
     cans = copy.deepcopy(can_generator.cans)
     cans.append((2, 2))
-    astar = AStar(grid, cans, robot, copy.deepcopy(display_scroll))
-    path = astar.solve()
+    #astar = AStar(grid, cans, robot, copy.deepcopy(display_scroll))
+    qlearn = QLearning(grid, cans, robot, copy.deepcopy(display_scroll), charger)
+    path = qlearn.learn()
 
-    while True:
-        display.fill((24, 164, 86))
+    # while True:
+    #     display.fill((24, 164, 86))
 
-        [handle_exit(grid) if event.type == pygame.QUIT else "" for event in pygame.event.get()]
+    #     [handle_exit(grid) if event.type == pygame.QUIT else "" for event in pygame.event.get()]
 
-        robot.main(display)
+    #     robot.main(display)
 
-        if can_generator.isNotEmpty():
-            x = robot.x + display_scroll[0]
-            y = robot.y + display_scroll[1]
-            can = can_generator.hasCanAt(x, y)
-            if can and robot.canCollectCan():
-                can_generator.remove(can[0], can[1])
-                robot.collectCan()
-                path = astar.solve()
-            else:
-                can_generator.drawCans(display, display_scroll)
+    #     if can_generator.isNotEmpty():
+    #         x = robot.x + display_scroll[0]
+    #         y = robot.y + display_scroll[1]
+    #         can = can_generator.hasCanAt(x, y)
+    #         if can and robot.canCollectCan():
+    #             can_generator.remove(can[0], can[1])
+    #             robot.collectCan()
+    #             path = astar.solve()
+    #         else:
+    #             can_generator.drawCans(display, display_scroll)
 
-        [draw_rectangle(
-            x=i,
-            y=j,
-            grid=grid,
-            scroll=display_scroll,
-            display=display
-        ) if element > 0 else 0 for (i, j), element in np.ndenumerate(grid.matrix)]
+    #     [draw_rectangle(
+    #         x=i,
+    #         y=j,
+    #         grid=grid,
+    #         scroll=display_scroll,
+    #         display=display
+    #     ) if element > 0 else 0 for (i, j), element in np.ndenumerate(grid.matrix)]
 
-        robot.update(display)
+    #     robot.update(display)
 
-        if abs(robot.x - (charger.x - display_scroll[0])) <= 1 \
-                and abs(robot.y - (charger.y - display_scroll[1])) <= 1:
-            robot.getBattery(5)
-            robot.cleanCans()
-            if can_generator.isEmpty():
-                print('You\'ve successfully collected all cans.')
-                handle_exit(grid)
-            last_charged = time.time()
-        else:
-            diff = int(time.time() - last_charged)
-            robot.dyingDamage(diff * 20)
-            last_charged += diff
+    #     if abs(robot.x - (charger.x - display_scroll[0])) <= 1 \
+    #             and abs(robot.y - (charger.y - display_scroll[1])) <= 1:
+    #         robot.getBattery(5)
+    #         robot.cleanCans()
+    #         if can_generator.isEmpty():
+    #             print('You\'ve successfully collected all cans.')
+    #             handle_exit(grid)
+    #         last_charged = time.time()
+    #     else:
+    #         diff = int(time.time() - last_charged)
+    #         robot.dyingDamage(diff * 20)
+    #         last_charged += diff
 
-        # keys = pygame.key.get_pressed()
-        # display_scroll = handle_pressed_keys(keys, robot, display_scroll)
+    #     keys = pygame.key.get_pressed()#
+    #     display_scroll = handle_pressed_keys(keys, robot, display_scroll)#
 
-        display_scroll = handle_path_key(path, display_scroll, robot)
+    #     #display_scroll = handle_path_key(path, display_scroll, robot)
 
-        clock.tick(15)
-        pygame.display.update()
+    #     clock.tick(15)
+    #     pygame.display.update()
+        
+    #     print(robot.getCurrentPosition(), display_scroll)
