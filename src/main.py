@@ -52,8 +52,10 @@ def handle_pressed_keys(keys, robot, display_scroll):
     return display_scroll
 
 
-def handle_exit(grid):
-    probs = grid.getResearchedProbMatrix()
+def handle_exit(grid, collector=None):
+    probs = grid.getResearchedProbMatrix() \
+        if collector is None \
+        else collector.getResearchedProbMatrix()
     plt.imshow(probs, cmap='hot', interpolation='nearest')
     plt.show()
 
@@ -94,17 +96,19 @@ if __name__ == "__main__":
 
     cans = copy.deepcopy(can_generator.cans)
     cans.append((2, 2))
-    #astar = AStar(grid, cans, robot, copy.deepcopy(display_scroll))
+    # astar = AStar(grid, cans, robot, copy.deepcopy(display_scroll))
+    # path = astar.solve()
     qlearn = QLearning(grid, cans, robot, copy.deepcopy(display_scroll), charger)
     path = qlearn.learn()
+    handle_exit(grid, qlearn.getCollector())
 
     # while True:
     #     display.fill((24, 164, 86))
-
+    #
     #     [handle_exit(grid) if event.type == pygame.QUIT else "" for event in pygame.event.get()]
-
+    #
     #     robot.main(display)
-
+    #
     #     if can_generator.isNotEmpty():
     #         x = robot.x + display_scroll[0]
     #         y = robot.y + display_scroll[1]
@@ -115,7 +119,7 @@ if __name__ == "__main__":
     #             path = astar.solve()
     #         else:
     #             can_generator.drawCans(display, display_scroll)
-
+    #
     #     [draw_rectangle(
     #         x=i,
     #         y=j,
@@ -123,28 +127,28 @@ if __name__ == "__main__":
     #         scroll=display_scroll,
     #         display=display
     #     ) if element > 0 else 0 for (i, j), element in np.ndenumerate(grid.matrix)]
-
+    #
     #     robot.update(display)
-
+    #
     #     if abs(robot.x - (charger.x - display_scroll[0])) <= 1 \
     #             and abs(robot.y - (charger.y - display_scroll[1])) <= 1:
     #         robot.getBattery(5)
     #         robot.cleanCans()
     #         if can_generator.isEmpty():
     #             print('You\'ve successfully collected all cans.')
-    #             handle_exit(grid)
+    #             handle_exit(grid, astar.getCollector())
     #         last_charged = time.time()
     #     else:
     #         diff = int(time.time() - last_charged)
     #         robot.dyingDamage(diff * 20)
     #         last_charged += diff
-
-    #     keys = pygame.key.get_pressed()#
-    #     display_scroll = handle_pressed_keys(keys, robot, display_scroll)#
-
-    #     #display_scroll = handle_path_key(path, display_scroll, robot)
-
+    #
+    #     # keys = pygame.key.get_pressed()
+    #     # display_scroll = handle_pressed_keys(keys, robot, display_scroll)
+    #
+    #     display_scroll = handle_path_key(path, display_scroll, robot)
+    #
     #     clock.tick(15)
     #     pygame.display.update()
         
-    #     print(robot.getCurrentPosition(), display_scroll)
+        # print(robot.getCurrentPosition(), display_scroll)

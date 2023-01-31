@@ -1,5 +1,6 @@
 from entity.grid.TCell import TCell
 from entity.robot.Robot import Robot
+from service.stats.Collector import Collector
 
 
 class AStar:
@@ -8,6 +9,7 @@ class AStar:
         self.robot = robot
         self.scroll = scroll
         self.cans = cans
+        self.collector = Collector()
 
     @property
     def robotCoordinates(self):
@@ -36,7 +38,7 @@ class AStar:
             manh_dist = self.manhattanHeuristic(can)
             if manh_dist < min_dist:
                 min_dist, min_can = manh_dist, can
-        if min_can not in self.cans:
+        if min_can not in self.cans or min_can == -1:
             return None
         self.cans.remove(min_can)
         return min_can
@@ -73,6 +75,7 @@ class AStar:
 
         while len(current) > 0 and end not in visited:
             v = current.pop(0)
+            self.collector.visit(v)
             for successor in self.getSuccessors(v):
                 if successor not in visited:
                     visited.append(successor)
@@ -88,3 +91,6 @@ class AStar:
     def updateScroll(self, pos):
         self.scroll[0] = pos[0] - self.robot.x
         self.scroll[1] = pos[1] - self.robot.y
+
+    def getCollector(self):
+        return self.collector
