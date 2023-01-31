@@ -9,7 +9,7 @@ class AStar:
         self.scroll = scroll
         self.cans = cans
 
-    #@property
+    @property
     def robotCoordinates(self):
         robot_x, robot_y = self.robot.getCurrentPosition()
         return robot_x + self.scroll[0], robot_y + self.scroll[1]

@@ -6,17 +6,19 @@ from entity.grid.TCell import TCell
 from entity.robot.Robot import Robot
 from entity.charger.Charger import Charger
 
+import pandas as pd
+
 
 class QLearning:
     def __init__(self, grid, cans, robot: Robot, scroll, charger:Charger):
         self.grid = grid
         self.robot = robot
-        self.scroll = scroll
         self.cans = cans
         self.charger = charger
+        self.currentPos = [1,1]
 
         # Hyperparams
-        self.n_episodes = 100 #10000
+        self.n_episodes = 10000
         self.max_iter_episode = 100
         self.exploration_proba = 0.9
         self.exploration_decreasing_decay = 0.001
@@ -24,41 +26,48 @@ class QLearning:
         self.gamma = 0.99
         self.lr = 0.1
 
-    @property
-    def robotCoordinates(self):
-        robot_x, robot_y = self.robot.getCurrentPosition()
-        return robot_x + self.scroll[0], robot_y + self.scroll[1]
+    # def robotCoordinates(self):
+    #     robot_x, robot_y = (30,30)#self.robot.getCurrentPosition()
+    #     print(robot_x + self.scroll[0], robot_y + self.scroll[1])
+    #     return (1,1)#robot_x + self.scroll[0], robot_y + self.scroll[1]
 
     @property
     def possibleDirections(self):
         return [(0, 0), (1, 0), (0, 1), (-1, 0), (0, -1)]
 
-    def getState(self):
-        #0 - high, 1 - low
-        return 1 if self.robot.battery.current <= 200 else 0
+    # def getState(self):
+    #     #0 - high, 1 - low
+    #     return 1 if self.robot.battery.current <= 200 else 0
     
     def step(self, action):
-        self.updateScroll(self.possibleDirections[action])
-        state = self.getState()
-
-        next_state = int((self.scroll[0] - 30)*(self.scroll[1] - 30)/16*16)#fix this
-
         reward = 0
-        if self.grid.isWall(*self.robotCoordinates):
+
+        #TODO: implement check whether there is a wall
+        #FIXME: rewrite this
+        if 60 > self.currentPos[0] + self.possibleDirections[action][0] >=0 and 60> self.currentPos[1] + self.possibleDirections[action][1] >=0 :
+            self.currentPos[0] += self.possibleDirections[action][0]
+            self.currentPos[1] += self.possibleDirections[action][1]
+        else:
             reward -= 100
+
+        # state = self.getState()
+
+        next_state =  self.currentPos[0] * self.currentPos[1]#fix this
+
         if self.robot.battery.current == 0:
             reward -= 500
        
-        #if unknown cell +10
+        #TODO:if unknown cell +10
         #S(low), R_search_cans (-10); if high - +10
         if action == 0:
             reward -= 25
 
-        if self.robotCoordinates in self.cans: #if can +200
+        if tuple(self.currentPos) in self.cans: #if can +200
+            print("REWARD")
             reward += 200
 
-        if state == 1 and self.robotCoordinates == self.charger.getChargerPosition():
-            reward += 10
+        # if state == 1 and self.currentPos == self.charger.getChargerPosition():
+        #     reward += 10
         
         if self.robot.trash.isNotFull():
             done = False
@@ -71,7 +80,7 @@ class QLearning:
 
     def build_QTable(self):
         #Initialize the Q-table to 0
-        n_observations = int((60*60 - 283)*2) #60x60 board - bricks and 2 states
+        n_observations = 60*60 #- 283, 60x60 board - bricks and 2 states  
         n_actions = len(self.possibleDirections)
         return np.zeros((n_observations, n_actions))
 
@@ -81,8 +90,9 @@ class QLearning:
 
         for e in range(self.n_episodes):
             #we initialize the first state of the episode
-            start = self.robotCoordinates
-            current_state = 0#env.reset()
+            # start = self.robotCoordinates()
+            start = self.currentPos
+            current_state = 0 #env.reset()
             done = False
     
             #sum the rewards that the agent gets from the environment
@@ -104,7 +114,7 @@ class QLearning:
 
                 next_state, reward, done = self.step(action)
 
-                print(self.robotCoordinates)
+                print(self.currentPos)
                 print(next_state, reward, done)
 
                 # We update our Q-table using the Q-learning iteration
@@ -119,13 +129,13 @@ class QLearning:
             exploration_proba = max(self.min_exploration_proba, np.exp(-self.exploration_decreasing_decay*e))
             total_rewards_episode.append(total_episode_reward)
             print("Training finished.\n")
+            print(QTable)
+            print(total_rewards_episode)
+            df = pd.DataFrame(QTable)
+            df.to_csv("qt2.csv")
 
         return total_rewards_episode, QTable
 
     # def solve(self):
 
     #     return path
-
-    def updateScroll(self, pos):
-        self.scroll[0] = pos[0] - self.robot.x
-        self.scroll[1] = pos[1] - self.robot.y
