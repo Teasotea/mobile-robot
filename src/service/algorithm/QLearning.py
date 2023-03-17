@@ -1,4 +1,5 @@
 # TODO build Base class
+import copy
 import random
 
 import numpy as np
@@ -14,12 +15,13 @@ class QLearning:
         self.grid = grid
         self.robot = robot
         self.cans = cans
+        self.temp_cans = copy.deepcopy(cans)
         self.charger = charger
         self.current_pos = [1, 1]
         self.collector = Collector()
 
         # Hyperparams
-        self.n_episodes = 10000
+        self.n_episodes = 5000  # 10000
         self.max_iter_episode = 100
         self.exploration_proba = 0.9
         self.exploration_decreasing_decay = 0.001
@@ -40,6 +42,9 @@ class QLearning:
     #     #0 - high, 1 - low
     #     return 1 if self.robot.battery.current <= 200 else 0
 
+    def restoreCans(self):
+        self.temp_cans = copy.deepcopy(self.cans)
+
     def step(self, action):
         reward = 0
 
@@ -58,16 +63,19 @@ class QLearning:
         if self.robot.battery.current == 0:
             reward -= 500
 
-        if self.collector.isVisited(self.current_pos):
-            reward += 10
+        if not self.collector.isVisited(self.current_pos):
+            reward += 20
 
         # S(low), R_search_cans (-10); if high - +10
         if action == 0:
             reward -= 25
 
-        if tuple(self.current_pos) in self.cans:  # if can +200
-            print("REWARD")
+        # FIXME if current position in unused cans
+        # QUESTION: is there a possibility to be always at position with can?
+        if tuple(self.current_pos) in self.temp_cans:  # if can +200
+            print("REWARD", len(self.temp_cans))
             reward += 200
+            self.temp_cans.remove(tuple(self.current_pos))
 
         # if state == 1 and self.currentPos == self.charger.getChargerPosition():
         #     reward += 10
@@ -78,7 +86,6 @@ class QLearning:
             done = True
         # elif self.robotCoordinates == self.charger.getChargerPosition():
         #    done = True
-
         self.collector.visit(self.current_pos)
         return next_state, reward, done
 
@@ -98,6 +105,7 @@ class QLearning:
             start = self.current_pos
             current_state = 0  # env.reset()
             done = False
+            self.restoreCans()
 
             # sum the rewards that the agent gets from the environment
             total_episode_reward = 0
@@ -138,7 +146,7 @@ class QLearning:
             # print(QTable)
             # print(total_rewards_episode)
             df = pd.DataFrame(QTable)
-            df.to_csv("qt2.csv")
+            df.to_csv("data/qtable.csv")
 
         return total_rewards_episode, QTable
 
