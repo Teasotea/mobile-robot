@@ -7,7 +7,6 @@ import pandas as pd
 
 from constant.Reward import Reward
 from constant.State import State
-from constant.Config import Config
 from entity.charger.Charger import Charger
 from entity.robot.Robot import Robot
 from service.stats.Collector import Collector

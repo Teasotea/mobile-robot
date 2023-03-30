@@ -3,7 +3,6 @@ import sys
 import time
 
 import matplotlib.pyplot as plt
-import numpy as np
 import pygame
 
 from constant.constants import BLOCK_SIZE as BS, GRID_SIZE
@@ -11,7 +10,6 @@ from entity.charger.Charger import Charger
 from entity.grid.Grid import Grid
 from entity.robot.Robot import Robot
 from service.CanGenerator import CanGenerator
-from service.algorithm.AStar import AStar
 from service.algorithm.QLearning import QLearning
 
 
@@ -150,5 +148,5 @@ if __name__ == "__main__":
     #
     #     clock.tick(15)
     #     pygame.display.update()
-        
-        # print(robot.getCurrentPosition(), display_scroll)
+
+    # print(robot.getCurrentPosition(), display_scroll)

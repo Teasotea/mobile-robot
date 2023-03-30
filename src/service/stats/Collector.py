@@ -22,4 +22,3 @@ class Collector:
 
     def getResearchedProbMatrix(self):
         return self.visited / self.total_count
-
