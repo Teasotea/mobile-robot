@@ -9,6 +9,9 @@ class Trash:
     def isNotFull(self):
         return self.current_size < self.max_size
 
+    def isFull(self):
+        return self.current_size >= self.max_size
+
     def clean(self):
         self.current_size = 0
 

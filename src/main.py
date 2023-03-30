@@ -98,7 +98,7 @@ if __name__ == "__main__":
     cans.append((2, 2))
     # astar = AStar(grid, cans, robot, copy.deepcopy(display_scroll))
     # path = astar.solve()
-    qlearn = QLearning(grid, cans, robot, copy.deepcopy(display_scroll), charger)
+    qlearn = QLearning(grid, cans, robot, charger)
     path = qlearn.learn()
     handle_exit(grid, qlearn.getCollector())
 
